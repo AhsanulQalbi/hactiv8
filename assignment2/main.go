@@ -13,6 +13,8 @@ func main() {
 
 	router.POST("/orders", controllers.CreateOrder)
 	router.GET("/orders", controllers.GetAllOrders)
+	router.PUT("/orders/:orderId", controllers.UpdateOrder)
+	router.DELETE("/orders/:orderId", controllers.DeleteOrder)
 
 	router.Run(":4444")
 }
