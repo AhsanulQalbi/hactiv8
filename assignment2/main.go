@@ -9,12 +9,12 @@ import (
 
 func main() {
 	database.ConnectDB()
-
-	// personController := controller.NewPersonController(db)
-
 	router := gin.Default()
 
-	router.POST("/create-order", controllers.CreateOrder)
+	router.POST("/orders", controllers.CreateOrder)
+	router.GET("/orders", controllers.GetAllOrders)
+	router.PUT("/orders/:orderId", controllers.UpdateOrder)
+	router.DELETE("/orders/:orderId", controllers.DeleteOrder)
 
 	router.Run(":4444")
 }
