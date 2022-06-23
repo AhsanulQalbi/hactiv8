@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"assignment2/database"
 	"assignment2/models"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -10,7 +12,7 @@ import (
 )
 
 func CreateOrder(ctx *gin.Context) {
-	//db := database.GetDB()
+	db := database.GetDB()
 	order := models.Order{}
 
 	if err := ctx.ShouldBindJSON(&order); err != nil {
@@ -18,15 +20,33 @@ func CreateOrder(ctx *gin.Context) {
 		return
 	}
 	fmt.Printf("isi body : %+v\n", order)
-	newOrder := models.Order{
-		CustomerName: ctx.PostForm("customer_name"),
-		OrderedAt:    time.Now().Local().String(),
+	order.OrderedAt = time.Now().String()
+	err := db.Create(&order).Error
+	if err != nil {
+		log.Println(err.Error())
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
 	}
 
 	ctx.JSON(http.StatusCreated, gin.H{
 		"success": true,
-		"payload": newOrder,
-		// "items":   items,
 	})
 
+}
+
+func GetAllOrders(ctx *gin.Context) {
+	db := database.GetDB()
+	orders := models.Order{}
+	err := db.Preload("Items").Find(&orders).Error
+	if err != nil {
+		panic(err)
+		return
+	}
+	fmt.Printf("%+v", orders)
+	ctx.JSON(http.StatusCreated, gin.H{
+		"success": true,
+		"result":  orders,
+	})
 }

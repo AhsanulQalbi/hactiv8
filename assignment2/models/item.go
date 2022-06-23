@@ -1,10 +1,8 @@
 package models
 
-import "github.com/jinzhu/gorm"
-
 type Item struct {
-	gorm.Model
-	ID          uint
+	// gorm.Model
+	ID          uint   `gorm:"primary_key"`
 	ItemCode    string `json:"item_code"`
 	Description string `json:"description"`
 	Quantity    uint   `json:"quantity"`
