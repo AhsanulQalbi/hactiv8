@@ -1,0 +1,91 @@
+<html>
+    <head>
+        <title>
+            Weather Status
+        </title>
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <style>
+            body{
+                margin: 0;
+                padding: 0;
+                background: #663347;
+                font-family: 'Roboto', sans-serif;
+            }
+            .weather-widget{
+                position: relative;
+                width: 357px;
+                height: 127px;
+                margin: 190px auto;
+                background-color: #fcfdfd;
+                border-radius: 10px;
+                padding: 25px;
+                padding-right: 30px;
+                box-shadow: 0px 28px 30px -25px #080c21;
+            }
+            .date{
+                font-size: 13px;
+                font-weight: bold;
+                color: rgba(0, 0, 0, 0.5);
+            }
+            .city{
+                font-size: 21px;
+                font-weight: bold;
+                text-transform: uppercase;
+                color: rgba(0, 0, 0, 0.7);
+                padding-top: 5px;
+            }
+            .panel{
+                display: inline-block;
+            }
+            .temperature{
+                font-size: 60px;
+                color: rgba(0, 0, 0, 0.9);
+            }
+            .temperature img{
+                width: 70px;
+            }
+            #right{
+                position: absolute;
+                top: 0;
+                margin-top: 5px;
+                padding-left: 22px;
+            }
+            #right img{
+                width: 160px;
+            }
+
+        </style>
+        <meta http-equiv="refresh" content="15" />
+    </head>
+    <body>
+        <div class="weather-widget">
+            <div class="panel" id="left">
+                <div class="date">
+                    Wind Status
+                </div>
+                <div class="city">
+                    {{.WindStatus}}
+                </div>
+                <div class="temperature">
+                    <img src="asset/wind.png" alt="">
+                    {{.Wind}}<small> Km/h</small>
+                </div>
+            </div>
+
+        </div>
+        <div class="weather-widget">
+            <div class="panel" id="left">
+                <div class="date">
+                    Water Status
+                </div>
+                <div class="city">
+                    {{.WaterStatus}}
+                </div>
+                <div class="temperature">
+                    <img src="asset/water.png" alt="">
+                    {{.Water}}<small> Meter</small>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
