@@ -28,16 +28,18 @@ func CreateSocialMedia(ctx *gin.Context) {
 	userData := ctx.MustGet("userData").(jwt.MapClaims)
 	userDataId := userData["id"].(float64)
 
-	sosmed.Created_at = time.Now().String()
+	sosmed.Created_at = time.Now()
 	sosmed.UserID = uint(userDataId)
 
 	err := db.Create(&sosmed).Error
 	if err != nil {
 		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"error":   err.Error(),
-			"msg":     "Failed to Create Social Media",
+			"status": http.StatusInternalServerError,
+			"data": gin.H{
+				"error": err.Error(),
+				"msg":   "Failed to Create Social Media",
+			},
 		})
 		return
 	}
@@ -65,9 +67,11 @@ func GetAllSocialMedia(ctx *gin.Context) {
 	if err != nil {
 		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"error":   err.Error(),
-			"msg":     "Failed to Get Social Media List",
+			"status": http.StatusInternalServerError,
+			"data": gin.H{
+				"error": err.Error(),
+				"msg":   "Failed to Get Social Media List",
+			},
 		})
 		return
 	}
@@ -89,14 +93,18 @@ func UpdateSocialMedia(ctx *gin.Context) {
 
 	temp, _ := strconv.Atoi(ctx.Param("socialMediaId"))
 	socialMedia.ID = uint(temp)
-	socialMedia.Updated_at = time.Now().String()
+	socialMedia.Updated_at = time.Now()
 
 	fmt.Printf("Value Update: %+v\n", socialMedia)
 	err := db.Model(&socialMedia).Where("id = ?", socialMedia.ID).Updates(&socialMedia).Error
 	if err != nil {
 		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+			"status": http.StatusInternalServerError,
+			"data": gin.H{
+				"error": err.Error(),
+				"msg":   "Failed to Update Social Media",
+			},
 		})
 		return
 	}
@@ -127,9 +135,11 @@ func DeleteSocialMedia(ctx *gin.Context) {
 	if err != nil {
 		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"error":   err.Error(),
-			"msg":     "Failed to Delete Social Media",
+			"status": http.StatusInternalServerError,
+			"data": gin.H{
+				"error": err.Error(),
+				"msg":   "Failed to Delete Social Media",
+			},
 		})
 		return
 	}

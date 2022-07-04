@@ -28,16 +28,18 @@ func CreateComment(ctx *gin.Context) {
 	userData := ctx.MustGet("userData").(jwt.MapClaims)
 	userDataId := userData["id"].(float64)
 
-	comment.Created_at = time.Now().String()
+	comment.Created_at = time.Now()
 	comment.UserID = uint(userDataId)
 
 	err := db.Create(&comment).Error
 	if err != nil {
 		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"error":   err.Error(),
-			"msg":     "Failed to Create Comment",
+			"status": http.StatusInternalServerError,
+			"data": gin.H{
+				"error": err.Error(),
+				"msg":   "Failed to Create Comment",
+			},
 		})
 		return
 	}
@@ -67,9 +69,11 @@ func GetAllComments(ctx *gin.Context) {
 	if err != nil {
 		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"error":   err.Error(),
-			"msg":     "Failed to Get Comment List",
+			"status": http.StatusInternalServerError,
+			"data": gin.H{
+				"error": err.Error(),
+				"msg":   "Failed to Get Comment List",
+			},
 		})
 		return
 	}
@@ -91,14 +95,18 @@ func UpdateComment(ctx *gin.Context) {
 
 	temp, _ := strconv.Atoi(ctx.Param("commentId"))
 	comment.ID = uint(temp)
-	comment.Updated_at = time.Now().String()
+	comment.Updated_at = time.Now()
 
 	fmt.Printf("Value Update: %+v\n", comment)
 	err := db.Model(&comment).Where("id = ?", comment.ID).Updates(&comment).Error
 	if err != nil {
 		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+			"status": http.StatusInternalServerError,
+			"data": gin.H{
+				"error": err.Error(),
+				"msg":   "Failed to Update Comment",
+			},
 		})
 		return
 	}
@@ -122,9 +130,11 @@ func DeleteComment(ctx *gin.Context) {
 	if err != nil {
 		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"error":   err.Error(),
-			"msg":     "Failed to Delete Comment",
+			"status": http.StatusInternalServerError,
+			"data": gin.H{
+				"error": err.Error(),
+				"msg":   "Failed to Delete Comment",
+			},
 		})
 		return
 	}

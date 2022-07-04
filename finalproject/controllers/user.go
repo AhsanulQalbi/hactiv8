@@ -32,18 +32,26 @@ func UserLogin(ctx *gin.Context) {
 	err := db.Debug().Where("email = ?", user.Email).Take(&user).Error
 
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "unauthorized",
-			"message": "invalid email/password",
+		log.Println(err.Error())
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"status": http.StatusUnauthorized,
+			"data": gin.H{
+				"error":   "unauthorized",
+				"message": "invalid email/password",
+			},
 		})
 		return
 	}
 
 	comparePass := helpers.ComparePass([]byte(user.Password), []byte(password))
 	if !comparePass {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"error":   "unauthorized",
-			"message": "invalid email/password",
+		log.Println(err.Error())
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"status": http.StatusUnauthorized,
+			"data": gin.H{
+				"error":   "unauthorized",
+				"message": "invalid email/password",
+			},
 		})
 		return
 	}
@@ -70,14 +78,18 @@ func UpdateUser(ctx *gin.Context) {
 
 	temp, _ := strconv.Atoi(ctx.Param("userId"))
 	user.ID = int(temp)
-	user.Updated_at = time.Now().String()
+	user.Updated_at = time.Now()
 
 	fmt.Printf("Value Update: %+v\n", user)
 	err := db.Model(&user).Where("id = ?", ctx.Param("userId")).Updates(&user).Error
 	if err != nil {
 		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+			"status": http.StatusInternalServerError,
+			"data": gin.H{
+				"error": err.Error(),
+				"msg":   "Failed to Update User Data",
+			},
 		})
 		return
 	}
@@ -108,15 +120,17 @@ func CreateUser(ctx *gin.Context) {
 		ctx.ShouldBind(&user)
 	}
 
-	user.Created_at = time.Now().String()
+	user.Created_at = time.Now()
 
 	err := db.Debug().Create(&user).Error
 	if err != nil {
 		log.Println(err.Error())
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"error":   err.Error(),
-			"msg":     "Failed to Create User",
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"status": http.StatusInternalServerError,
+			"data": gin.H{
+				"error": err.Error(),
+				"msg":   "Failed to Create User",
+			},
 		})
 		return
 	}
@@ -143,7 +157,14 @@ func DeleteUser(ctx *gin.Context) {
 	err := db.Where("id= ?", userIdFromJwt).Delete(&user).Error
 
 	if err != nil {
-		fmt.Println("Error deleting User : ", err.Error())
+		log.Println(err.Error())
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"status": http.StatusInternalServerError,
+			"data": gin.H{
+				"error": err.Error(),
+				"msg":   "Failed to Delete User",
+			},
+		})
 		return
 	}
 

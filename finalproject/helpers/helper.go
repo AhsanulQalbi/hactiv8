@@ -3,6 +3,7 @@ package helpers
 import (
 	"errors"
 	"strings"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -29,6 +30,7 @@ func GenerateToken(userId int, email string) string {
 	claims := jwt.MapClaims{
 		"id":    userId,
 		"email": email,
+		"time":  time.Now().String(),
 	}
 	parseToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedToken, _ := parseToken.SignedString([]byte("rahasia"))

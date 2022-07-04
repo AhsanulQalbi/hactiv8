@@ -27,16 +27,18 @@ func CreatePhoto(ctx *gin.Context) {
 	userData := ctx.MustGet("userData").(jwt.MapClaims)
 	userDataId := userData["id"].(float64)
 
-	photo.Created_at = time.Now().String()
+	photo.Created_at = time.Now()
 	photo.UserID = uint(userDataId)
 
 	err := db.Create(&photo).Error
 	if err != nil {
 		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"error":   err.Error(),
-			"msg":     "Failed to Create Photo",
+			"status": http.StatusInternalServerError,
+			"data": gin.H{
+				"error": err.Error(),
+				"msg":   "Failed to Create Photo",
+			},
 		})
 		return
 	}
@@ -65,9 +67,11 @@ func GetAllPhotos(ctx *gin.Context) {
 	if err != nil {
 		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"error":   err.Error(),
-			"msg":     "Failed to Get Photo List",
+			"status": http.StatusInternalServerError,
+			"data": gin.H{
+				"error": err.Error(),
+				"msg":   "Failed to Get Photo List",
+			},
 		})
 		return
 	}
@@ -89,14 +93,18 @@ func UpdatePhoto(ctx *gin.Context) {
 
 	temp, _ := strconv.Atoi(ctx.Param("photoId"))
 	photo.ID = uint(temp)
-	photo.Updated_at = time.Now().String()
+	photo.Updated_at = time.Now()
 
 	fmt.Printf("Value Update: %+v\n", photo)
 	err := db.Model(&photo).Where("id = ?", photo.ID).Updates(&photo).Error
 	if err != nil {
 		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+			"status": http.StatusInternalServerError,
+			"data": gin.H{
+				"error": err.Error(),
+				"msg":   "Failed to Update Photo",
+			},
 		})
 		return
 	}
@@ -129,9 +137,11 @@ func DeletePhoto(ctx *gin.Context) {
 	if err != nil {
 		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"error":   err.Error(),
-			"msg":     "Failed to Delete Photo",
+			"status": http.StatusInternalServerError,
+			"data": gin.H{
+				"error": err.Error(),
+				"msg":   "Failed to Delete Photo",
+			},
 		})
 		return
 	}
