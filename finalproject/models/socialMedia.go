@@ -15,7 +15,7 @@ type SocialMedia struct {
 	UserID           uint      `json:"user_id,omitempty"`
 	Created_at       time.Time `json:"created_at,omitempty"`
 	Updated_at       time.Time `json:"updated_at"`
-	User             *User
+	User             *User     `json:"User,omitempty"`
 }
 
 func (s *SocialMedia) BeforeCreate(tx *gorm.DB) (err error) {

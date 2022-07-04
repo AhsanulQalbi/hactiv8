@@ -4,7 +4,6 @@ import (
 	"finalproject/database"
 	"finalproject/models"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -17,7 +16,6 @@ func UserAuthorization() gin.HandlerFunc {
 		UserId, err := strconv.Atoi(c.Param("userId"))
 
 		if err != nil {
-			log.Println(err.Error())
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"status": http.StatusBadRequest,
 				"data": gin.H{
@@ -34,7 +32,6 @@ func UserAuthorization() gin.HandlerFunc {
 		fmt.Println("ini user param : ", UserId)
 
 		if UserId != int(userIdFromJwt) {
-			log.Println(err.Error())
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"status": http.StatusBadRequest,
 				"data": gin.H{
@@ -56,7 +53,6 @@ func PhotoAuthorization() gin.HandlerFunc {
 		photoId, err := strconv.Atoi(c.Param("photoId"))
 
 		if err != nil {
-			log.Println(err.Error())
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"status": http.StatusBadRequest,
 				"data": gin.H{
@@ -72,7 +68,6 @@ func PhotoAuthorization() gin.HandlerFunc {
 
 		err = db.Select("UserID").First(&photo, uint(photoId)).Error
 		if err != nil {
-			log.Println(err.Error())
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"status": http.StatusBadRequest,
 				"data": gin.H{
@@ -86,7 +81,6 @@ func PhotoAuthorization() gin.HandlerFunc {
 		fmt.Println(photo.UserID, userIdFromJwt)
 
 		if photo.UserID != uint(userIdFromJwt) {
-			log.Println(err.Error())
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"status": http.StatusBadRequest,
 				"data": gin.H{
@@ -108,7 +102,6 @@ func CommentAuthorization() gin.HandlerFunc {
 		commentId, err := strconv.Atoi(c.Param("commentId"))
 
 		if err != nil {
-			log.Println(err.Error())
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"status": http.StatusBadRequest,
 				"data": gin.H{
@@ -124,7 +117,6 @@ func CommentAuthorization() gin.HandlerFunc {
 
 		err = db.Select("UserID").First(&comment, uint(commentId)).Error
 		if err != nil {
-			log.Println(err.Error())
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"status": http.StatusBadRequest,
 				"data": gin.H{
@@ -136,7 +128,6 @@ func CommentAuthorization() gin.HandlerFunc {
 		}
 
 		if comment.UserID != uint(userIdFromJwt) {
-			log.Println(err.Error())
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"status": http.StatusBadRequest,
 				"data": gin.H{
@@ -158,7 +149,6 @@ func SocialMediaAuthorization() gin.HandlerFunc {
 		socialMediaId, err := strconv.Atoi(c.Param("socialMediaId"))
 
 		if err != nil {
-			log.Println(err.Error())
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"status": http.StatusBadRequest,
 				"data": gin.H{
@@ -174,7 +164,6 @@ func SocialMediaAuthorization() gin.HandlerFunc {
 
 		err = db.Select("UserID").First(&socialMedia, uint(socialMediaId)).Error
 		if err != nil {
-			log.Println(err.Error())
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"status": http.StatusBadRequest,
 				"data": gin.H{
@@ -186,7 +175,6 @@ func SocialMediaAuthorization() gin.HandlerFunc {
 		}
 
 		if socialMedia.UserID != uint(userIdFromJwt) {
-			log.Println(err.Error())
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"status": http.StatusBadRequest,
 				"data": gin.H{

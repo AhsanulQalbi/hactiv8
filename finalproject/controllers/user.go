@@ -5,7 +5,6 @@ import (
 	"finalproject/helpers"
 	"finalproject/models"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -32,7 +31,6 @@ func UserLogin(ctx *gin.Context) {
 	err := db.Debug().Where("email = ?", user.Email).Take(&user).Error
 
 	if err != nil {
-		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"status": http.StatusUnauthorized,
 			"data": gin.H{
@@ -45,7 +43,6 @@ func UserLogin(ctx *gin.Context) {
 
 	comparePass := helpers.ComparePass([]byte(user.Password), []byte(password))
 	if !comparePass {
-		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"status": http.StatusUnauthorized,
 			"data": gin.H{
@@ -81,9 +78,8 @@ func UpdateUser(ctx *gin.Context) {
 	user.Updated_at = time.Now()
 
 	fmt.Printf("Value Update: %+v\n", user)
-	err := db.Model(&user).Where("id = ?", ctx.Param("userId")).Updates(&user).Error
+	err := db.Model(&user).Where("id = ?", user.ID).Updates(&user).Error
 	if err != nil {
-		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status": http.StatusInternalServerError,
 			"data": gin.H{
@@ -94,7 +90,7 @@ func UpdateUser(ctx *gin.Context) {
 		return
 	}
 	updatedUser := models.User{}
-	_ = db.First(&updatedUser).Error
+	_ = db.First(&updatedUser, "id = ?", user.ID).Error
 
 	ctx.JSON(http.StatusCreated, gin.H{
 		"status": http.StatusOK,
@@ -121,10 +117,10 @@ func CreateUser(ctx *gin.Context) {
 	}
 
 	user.Created_at = time.Now()
+	user.Updated_at = time.Now()
 
 	err := db.Debug().Create(&user).Error
 	if err != nil {
-		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status": http.StatusInternalServerError,
 			"data": gin.H{
@@ -157,7 +153,6 @@ func DeleteUser(ctx *gin.Context) {
 	err := db.Where("id= ?", userIdFromJwt).Delete(&user).Error
 
 	if err != nil {
-		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status": http.StatusInternalServerError,
 			"data": gin.H{

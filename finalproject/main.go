@@ -14,5 +14,5 @@ func main() {
 	routers.PhotoRouter(router)
 	routers.CommentRouter(router)
 	routers.SocialMediaRouter(router)
-	router.Run()
+	router.Run(":8080")
 }

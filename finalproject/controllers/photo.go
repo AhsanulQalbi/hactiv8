@@ -5,7 +5,6 @@ import (
 	"finalproject/helpers"
 	"finalproject/models"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -28,11 +27,11 @@ func CreatePhoto(ctx *gin.Context) {
 	userDataId := userData["id"].(float64)
 
 	photo.Created_at = time.Now()
+	photo.Updated_at = time.Now()
 	photo.UserID = uint(userDataId)
 
 	err := db.Create(&photo).Error
 	if err != nil {
-		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status": http.StatusInternalServerError,
 			"data": gin.H{
@@ -60,12 +59,12 @@ func GetAllPhotos(ctx *gin.Context) {
 	db := database.GetDB()
 	userData := ctx.MustGet("userData").(jwt.MapClaims)
 	userDataId := userData["id"].(float64)
+	fmt.Println("iniuserid", userDataId)
 	photos := []models.Photo{}
 	err := db.Preload("User", func(tx *gorm.DB) *gorm.DB {
-		return tx.Select("ID", "email", "username")
-	}).Find(&photos).Where("Userid : ?", userDataId).Error
+		return tx.Select("ID", "email", "username", "created_at", "updated_at")
+	}).Where("user_id = ?", uint(userDataId)).Find(&photos).Error
 	if err != nil {
-		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status": http.StatusInternalServerError,
 			"data": gin.H{
@@ -98,7 +97,6 @@ func UpdatePhoto(ctx *gin.Context) {
 	fmt.Printf("Value Update: %+v\n", photo)
 	err := db.Model(&photo).Where("id = ?", photo.ID).Updates(&photo).Error
 	if err != nil {
-		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status": http.StatusInternalServerError,
 			"data": gin.H{
@@ -110,7 +108,7 @@ func UpdatePhoto(ctx *gin.Context) {
 	}
 
 	updatedPhoto := models.Photo{}
-	_ = db.First(&updatedPhoto).Error
+	_ = db.First(&updatedPhoto, "id = ?", photo.ID).Error
 
 	ctx.JSON(http.StatusCreated, gin.H{
 		"status": http.StatusOK,
@@ -135,7 +133,6 @@ func DeletePhoto(ctx *gin.Context) {
 	err := db.Where("id= ?", photo.ID).Delete(&photo).Error
 
 	if err != nil {
-		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status": http.StatusInternalServerError,
 			"data": gin.H{

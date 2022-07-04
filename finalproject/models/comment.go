@@ -15,8 +15,8 @@ type Comment struct {
 	Message    string    `json:"message"`
 	Created_at time.Time `json:"created_at"`
 	Updated_at time.Time `json:"updated_at"`
-	User       *User
-	Photo      *Photo
+	User       *User     `json:"User,omitempty"`
+	Photo      *Photo    `json:"Photo,omitempty"`
 }
 
 func (c *Comment) BeforeCreate(tx *gorm.DB) (err error) {

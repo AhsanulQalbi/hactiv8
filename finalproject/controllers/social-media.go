@@ -5,7 +5,6 @@ import (
 	"finalproject/helpers"
 	"finalproject/models"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -29,11 +28,11 @@ func CreateSocialMedia(ctx *gin.Context) {
 	userDataId := userData["id"].(float64)
 
 	sosmed.Created_at = time.Now()
+	sosmed.Updated_at = time.Now()
 	sosmed.UserID = uint(userDataId)
 
 	err := db.Create(&sosmed).Error
 	if err != nil {
-		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status": http.StatusInternalServerError,
 			"data": gin.H{
@@ -62,10 +61,9 @@ func GetAllSocialMedia(ctx *gin.Context) {
 	userDataId := userData["id"].(float64)
 	socialMedias := []models.SocialMedia{}
 	err := db.Preload("User", func(tx *gorm.DB) *gorm.DB {
-		return tx.Select("ID", "username")
-	}).Find(&socialMedias).Where("UserID : ?", userDataId).Error
+		return tx.Select("ID", "username", "created_at", "updated_at")
+	}).Where("user_id = ?", uint(userDataId)).Find(&socialMedias).Error
 	if err != nil {
-		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status": http.StatusInternalServerError,
 			"data": gin.H{
@@ -75,8 +73,8 @@ func GetAllSocialMedia(ctx *gin.Context) {
 		})
 		return
 	}
-	ctx.JSON(http.StatusCreated, gin.H{
-		"status": http.StatusCreated,
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": http.StatusOK,
 		"data":   socialMedias,
 	})
 }
@@ -98,7 +96,6 @@ func UpdateSocialMedia(ctx *gin.Context) {
 	fmt.Printf("Value Update: %+v\n", socialMedia)
 	err := db.Model(&socialMedia).Where("id = ?", socialMedia.ID).Updates(&socialMedia).Error
 	if err != nil {
-		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status": http.StatusInternalServerError,
 			"data": gin.H{
@@ -110,7 +107,7 @@ func UpdateSocialMedia(ctx *gin.Context) {
 	}
 
 	updatedSosmed := models.SocialMedia{}
-	_ = db.First(&updatedSosmed).Error
+	_ = db.First(&updatedSosmed, "id = ?", socialMedia.ID).Error
 
 	ctx.JSON(http.StatusCreated, gin.H{
 		"status": http.StatusOK,
@@ -133,7 +130,6 @@ func DeleteSocialMedia(ctx *gin.Context) {
 	err := db.Where("ID= ?", sosmed.ID).Delete(&sosmed).Error
 
 	if err != nil {
-		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status": http.StatusInternalServerError,
 			"data": gin.H{

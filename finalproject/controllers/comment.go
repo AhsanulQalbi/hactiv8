@@ -5,7 +5,6 @@ import (
 	"finalproject/helpers"
 	"finalproject/models"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -29,11 +28,11 @@ func CreateComment(ctx *gin.Context) {
 	userDataId := userData["id"].(float64)
 
 	comment.Created_at = time.Now()
+	comment.Updated_at = time.Now()
 	comment.UserID = uint(userDataId)
 
 	err := db.Create(&comment).Error
 	if err != nil {
-		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status": http.StatusInternalServerError,
 			"data": gin.H{
@@ -62,12 +61,11 @@ func GetAllComments(ctx *gin.Context) {
 	userDataId := userData["id"].(float64)
 	comments := []models.Comment{}
 	err := db.Preload("User", func(tx *gorm.DB) *gorm.DB {
-		return tx.Select("ID", "email", "username")
+		return tx.Select("ID", "email", "username", "created_at", "updated_at")
 	}).Preload("Photo", func(tx *gorm.DB) *gorm.DB {
-		return tx.Select("ID", "title", "caption", "photo_url", "user_id")
-	}).Find(&comments).Where("UserID : ?", userDataId).Error
+		return tx.Select("ID", "title", "caption", "photo_url", "user_id", "created_at", "updated_at")
+	}).Where("user_id = ?", uint(userDataId)).Find(&comments).Error
 	if err != nil {
-		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status": http.StatusInternalServerError,
 			"data": gin.H{
@@ -100,7 +98,6 @@ func UpdateComment(ctx *gin.Context) {
 	fmt.Printf("Value Update: %+v\n", comment)
 	err := db.Model(&comment).Where("id = ?", comment.ID).Updates(&comment).Error
 	if err != nil {
-		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status": http.StatusInternalServerError,
 			"data": gin.H{
@@ -110,10 +107,12 @@ func UpdateComment(ctx *gin.Context) {
 		})
 		return
 	}
+	updatedComment := models.Comment{}
+	_ = db.First(&updatedComment, "id = ?", comment.ID).Error
 
 	ctx.JSON(http.StatusCreated, gin.H{
 		"status": http.StatusOK,
-		"data":   comment,
+		"data":   updatedComment,
 	})
 }
 
@@ -128,7 +127,6 @@ func DeleteComment(ctx *gin.Context) {
 	err := db.Where("ID= ?", comment.ID).Delete(&comment).Error
 
 	if err != nil {
-		log.Println(err.Error())
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"status": http.StatusInternalServerError,
 			"data": gin.H{
