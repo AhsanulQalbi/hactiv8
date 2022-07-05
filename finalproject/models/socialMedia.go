@@ -9,7 +9,7 @@ import (
 )
 
 type SocialMedia struct {
-	ID               uint      `gorm:"primary key" json:"id,omitempty" `
+	ID               uint      `gorm:"primary key;auto_increment" json:"id,omitempty" `
 	Name             string    `json:"name,omitempty"`
 	Social_Media_Url string    `json:"social_media_url,omitempty"`
 	UserID           uint      `json:"user_id,omitempty"`

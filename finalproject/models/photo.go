@@ -9,7 +9,7 @@ import (
 )
 
 type Photo struct {
-	ID         uint      `gorm:"primary key" json:"id"`
+	ID         uint      `gorm:"primary key;auto_increment" json:"id"`
 	Title      string    `json:"title"`
 	Caption    string    `json:"caption"`
 	Photo_url  string    `json:"photo_url"`
