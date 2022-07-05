@@ -74,8 +74,8 @@ func GetAllPhotos(ctx *gin.Context) {
 		})
 		return
 	}
-	ctx.JSON(http.StatusCreated, gin.H{
-		"status": http.StatusCreated,
+	ctx.JSON(http.StatusOK, gin.H{
+		"status": http.StatusOK,
 		"data":   photos,
 	})
 }
